@@ -10,7 +10,7 @@ def parse_line(line):
 
 def execute(input_file):
 	with open(input_file, 'r') as f:
-		entries = list(map(parse_line, f.readlines()))
+		entries = map(parse_line, f.readlines())
 
 	horizontal = 0
 	depth = 0
