@@ -11,7 +11,7 @@ def find_most_used_bit(
 	total = sum([e[index] for e in source])
 	target = (len(source) / 2)
 
-	return total == target, total > target
+	return total == target, 1 if total > target else 0
 
 def parse_line(line):
 	return list(map(int, line.strip()))
@@ -25,13 +25,17 @@ def execute(input_file):
 	ox_source = entries.copy()
 	scr_source = entries.copy()
 
+	print('')
+
 	for index, c in enumerate(entries[0]):
 		if len(ox_source) > 1:
 			# filter down based on this index
 			equal, most_used_bit = find_most_used_bit(ox_source, index)
 			if not equal:
+				print(index, len(ox_source), most_used_bit)
 				ox_source = [s for s in ox_source if s[index] == most_used_bit]
 			else:
+				print(index, len(ox_source), 1)
 				ox_source = [s for s in ox_source if s[index] == 1]
 		if len(scr_source) > 1:
 			# filter down based on this index
@@ -45,6 +49,7 @@ def execute(input_file):
 	a = convert_list_to_binary(ox_source[0])
 	b = convert_list_to_binary(scr_source[0])
 
+	print('')
 	print(len(ox_source))
 	print(len(scr_source))
 
