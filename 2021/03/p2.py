@@ -2,8 +2,6 @@
 
 import time
 
-def convert_list_to_binary(source):
-	return sum([c << i for i, c in enumerate(reversed(source))])
 
 def find_most_used_bit(
 	source,
@@ -12,6 +10,26 @@ def find_most_used_bit(
 	target = (len(source) / 2)
 
 	return total == target, 1 if total > target else 0
+
+def find_least_used_bit(
+	source,
+	index):
+	equal, most_used_bit = find_most_used_bit(source, index)
+
+	return equal, 1 - most_used_bit
+
+def filter(
+	source,
+	index,
+	selector,
+	val_if_equal):
+	if len(source) > 1:
+		equal, result = selector(source, index)
+		if not equal:
+			return [s for s in source if s[index] == result]
+		else:
+			return [s for s in source if s[index] == val_if_equal]
+	return source
 
 def parse_line(line):
 	return list(map(int, line.strip()))
@@ -24,27 +42,14 @@ def execute(input_file):
 	scr_source = entries.copy()
 
 	for index, c in enumerate(entries[0]):
-		if len(ox_source) > 1:
-			# filter down based on this index
-			equal, most_used_bit = find_most_used_bit(ox_source, index)
-			if not equal:
-				ox_source = [s for s in ox_source if s[index] == most_used_bit]
-			else:
-				ox_source = [s for s in ox_source if s[index] == 1]
-		if len(scr_source) > 1:
-			# filter down based on this index
-			equal, most_used_bit = find_most_used_bit(scr_source, index)
-			if not equal:
-				least_used_bit = 1 - most_used_bit
-				scr_source = [s for s in scr_source if s[index] == least_used_bit]
-			else:
-				scr_source = [s for s in scr_source if s[index] == 0]
+		ox_source = filter(ox_source, index, find_most_used_bit, 1)
+		scr_source = filter(scr_source, index, find_least_used_bit, 0)
 
-	a = convert_list_to_binary(ox_source[0])
-	b = convert_list_to_binary(scr_source[0])
+	# binary conversion
+	a = int(''.join(map(str, ox_source[0])), 2)
+	b = int(''.join(map(str, scr_source[0])), 2)
 
 	return a * b
-
 
 def main(input_file):
 	start = time.perf_counter()
