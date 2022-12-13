@@ -84,7 +84,7 @@ def main(input_file):
 	result = execute(input_file)
 
 	post = time.perf_counter()
-	
+
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
 if __name__ == '__main__':

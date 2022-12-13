@@ -10,11 +10,7 @@ def execute(input_file):
 	with open(input_file, 'r') as f:
 		entries = list(map(parse_line, f))
 
-	sums = [0] * len(entries[0])
-
-	for entry in entries:
-		for index, cell in enumerate(entry):
-			sums[index] += cell
+	sums = list(map(sum, zip(*entries)))
 
 	threshold = len(entries) / 2
 

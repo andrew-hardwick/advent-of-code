@@ -6,26 +6,30 @@ import time
 def parse_line(line):
 	split = line.strip().split(' ')
 
-	return split[0], int(split[1])
+	command = split[0]
+	val = int(split[1])
+
+	if command == 'forward':
+		return (0, val)
+	elif command == 'down':
+		return (val, 0)
+	else:
+		return (-val, 0)
 
 def execute(input_file):
 	with open(input_file, 'r') as f:
 		entries = map(parse_line, f.readlines())
 
-	horizontal = 0
+	hori = 0
+	vert = 0
 	aim = 0
-	depth = 0
 
-	for command, val in entries:
-		if command == 'forward':
-			horizontal += val
-			depth += val * aim
-		elif command == 'down':
-			aim += val
-		else:
-			aim -= val
+	for d_aim, d_hori in entries:
+		aim += d_aim
+		hori += d_hori
+		vert += aim * d_hori
 
-	return horizontal * depth
+	return hori * vert
 
 def main(input_file):
 	pre = time.perf_counter()
