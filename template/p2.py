@@ -1,25 +1,26 @@
-# 2021/xx/p2.py
+# 20xx/xx/p2.py
 
 import time
 
 
-def parse_line(line):
-	return line.strip()
+def parse_input(infn):
+	with open(infn, 'r') as f:
+		data = (str.strip(l) for l in f.readlines())
 
-def execute(input_file):
+	return data
 
-	with open(input_file, 'r') as f:
-		entries = list(map(parse_line, f.readlines()))
+def execute(infn):
+	data = parse_input(infn)
 
 	# do the thing
 	result = 0
 
 	return result
 
-def main(input_file):
+def main(infn):
 	pre = time.perf_counter()
 
-	result = execute(input_file)
+	result = execute(infn)
 
 	post = time.perf_counter()
 
