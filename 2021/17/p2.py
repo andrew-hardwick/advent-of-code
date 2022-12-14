@@ -3,6 +3,8 @@
 import math
 import time
 
+from p1 import load_target_area
+
 
 def valid(x_vel, y_vel, min_x, max_x, min_y, max_y):
 	x = 0
