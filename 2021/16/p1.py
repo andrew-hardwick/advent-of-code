@@ -1,4 +1,4 @@
-# 2021/xx/p1.py
+# 2021/16/p1.py
 
 import time
 
@@ -98,23 +98,23 @@ def print_packet_tree(packet, level):
 def convert_to_nibble(c):
 	c_int = int(c, 16)
 
-	return [(c_int & (1 << i)) >> i for i in range(3, -1, -1)]
+	return ((c_int & (1 << i)) >> i for i in range(3, -1, -1))
 
 def load_packets(infn):
 	with open(infn, 'r') as f:
 		packet_strings = (str.strip(l) for l in f.readlines())
 
-	packet_source = [[bit for c in l for bit in convert_to_nibble(c)] for l in packet_strings]
+	packet_source = ((bit for c in l for bit in convert_to_nibble(c)) for l in packet_strings)
 
-	packets = [parse_packet(ps) for ps in packet_source]
-	packets = [p for p, li in packets]
+	packets = (parse_packet(ps) for ps in packet_source)
+	packets = (p for p, li in packets)
 
 	return packets
 
 def execute(infn):
 	packets = load_packets(infn)
 
-	version_numbers = [get_all_version_numbers(packet) for packet in packets]
+	version_numbers = (get_all_version_numbers(packet) for packet in packets)
 
 	if len(packets) == 1:
 		return sum(version_numbers[0])

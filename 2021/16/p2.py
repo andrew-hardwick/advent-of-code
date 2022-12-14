@@ -1,4 +1,4 @@
-# 2021/xx/p2.py
+# 2021/16/p2.py
 
 import math
 import time
@@ -31,7 +31,7 @@ def evaluate(packet):
 def execute(infn):
 	packets = load_packets(infn)
 
-	results = [evaluate(p) for p in packets]
+	results = (evaluate(p) for p in packets)
 
 	if len(results) == 1:
 		return results[0]

@@ -1,4 +1,4 @@
-# 2021/xx/p2.py
+# 2021/17/p2.py
 
 import math
 import time
@@ -44,16 +44,6 @@ def find_valid_initial_velocities(target_x, target_y):
 				valid_velocities.append((x_vel, y_vel))
 
 	return valid_velocities
-
-def load_target_area(infn):
-	with open(infn, 'r') as f:
-		source = f.readline()
-
-	sanitized = source.replace('target area: x=', '').replace(', y=', ' ').replace('..', ' ')
-
-	values = [int(i) for i in sanitized.split(' ')]
-
-	return (values[0], values[1]), (values[2], values[3])
 
 def execute(infn):
 	target_x, target_y = load_target_area(infn)
