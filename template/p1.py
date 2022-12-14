@@ -24,7 +24,7 @@ def main(infn):
 
 	post = time.perf_counter()
 
-	print(result, 'in', (post - pre) * 1000, 'ms')
+	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
 
 if __name__ == '__main__':
 	main('test1.txt')

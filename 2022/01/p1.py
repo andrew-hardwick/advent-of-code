@@ -1,21 +1,23 @@
-# 20xx/xx/p2.py
+# 2022/01/p1.py
 
+import itertools
 import time
 
 
 def parse_input(infn):
 	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
+		source = (str.strip(l) for l in f.readlines())
 
-	return data
+	elves = (list(elf) for empty, elf in itertools.groupby(source, key=lambda x: x == '') if not empty)
+
+	return ((int(i) for i in e) for e in elves)
 
 def execute(infn):
-	data = parse_input(infn)
+	elves = parse_input(infn)
 
-	# do the thing
-	result = 0
+	totals = [sum(e) for e in elves]
 
-	return result
+	return max(totals)
 
 def main(infn):
 	pre = time.perf_counter()

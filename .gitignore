@@ -133,3 +133,4 @@ dmypy.json
 **/test*.txt
 **/input.txt
 **/*_lookup
+**/*_source.txt

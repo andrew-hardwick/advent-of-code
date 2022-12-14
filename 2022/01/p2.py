@@ -1,21 +1,16 @@
-# 20xx/xx/p2.py
+# 2022/01/p2.py
 
 import time
 
+from p1 import parse_input
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
-
-	return data
 
 def execute(infn):
-	data = parse_input(infn)
+	elves = parse_input(infn)
 
-	# do the thing
-	result = 0
+	totals = sorted([sum(e) for e in elves], reverse=True)
 
-	return result
+	return sum(totals[:3])
 
 def main(infn):
 	pre = time.perf_counter()
