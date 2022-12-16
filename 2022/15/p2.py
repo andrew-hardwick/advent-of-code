@@ -1,136 +1,121 @@
-# 2022/15/p2.py
+# 20xx/xx/p2.py
 
 import itertools
-import math
 import time
 
-from p1 import parse_input, mh_dist
+from p1 import mh_dist, parse_input
 
-def is_tile_enclosed(tile, sensors):
-	x, y, r_t = tile
 
-	p_t = (x, y)
-
+def is_point_enclosed(p_t, sensors):
 	for p_s, r_s in sensors:
 		dist = mh_dist(p_t, p_s)
 
-		if r_t == 0:
-			#print(tile, p_s, r_s)
-			pass
-		if mh_dist(p_t, p_s) <= r_s - r_t:
-
+		if mh_dist(p_t, p_s) <= r_s:
 			return True
 
 	return False
 
-def is_tile_offgrid(min_lim, max_lim, tile):
-	x, y, r = tile
+def find_nearly_adjacent_pairs(sensors, spacing):
+	candidate_pairs = itertools.combinations(sensors, 2)
 
-	min_x = x - r
-	max_x = x + r
-	min_y = y - r
-	max_y = y + r
+	pairs = []
 
-	if min_x > max_lim or max_x < min_lim or min_y > max_lim or max_y < min_lim:
-		return True
-	return False
+	for pair in candidate_pairs:
+		(a, ra), (b, rb) = pair
+		if mh_dist(a, b) == ra + rb + spacing:
+			pairs.append(pair)
 
-def tesselate_tile(tile):
-	x, y, r = tile
+	return pairs
 
-	if r == 0:
-		return []
-	if r == 1:
-		r = 0
+def get_line(pair):
+	a, b = pair
+
+	(xa, ya), ra = a
+	(xb, yb), rb = b
+
+	if (xa < xb and ya < yb) or (xa > xb and ya > yb):
+		if xa < xb:
+			point = (xa, ya + ra + 1)
+		else:
+			point = (xb, yb + rb + 1)
+		return point, (1, -1)
 	else:
-		if not r % 2 == 0:
-			r += 1
+		if xa < xb:
+			point = (xa, ya - ra - 1)
+		else:
+			point = (xb, yb - rb - 1)
+		return point, (1, 1)
 
-		r = int(r / 2)
+def filter_per_slope(points, slope):
+	result = set()
 
-	offset_base = r
+	for point in points:
+		duplicate = False
+		for analyzed in result:
+			diff_x = (point[0] - analyzed[0]) * slope[0]
+			diff_y = (point[1] - analyzed[1]) * slope[1]
 
-	if not offset_base % 2 == 0:
-		offset_base -= 1
-	if offset_base == 0:
-		offset_base = 1
+			if diff_x == diff_y:
+				duplicate = True
 
-	offsets = [(0, 0), (offset_base, 0), (-offset_base, 0), (0, offset_base), (0, -offset_base)]
+		if not duplicate:
+			result.add(point)
 
-	new_points = [(x + a, y + b, r) for a, b in offsets]
+	return [(p, slope) for p in result]
 
-	#print('adding ', new_points)
+def remove_duplicate_lines(lines):
+	pos_slope_points = [p for p, s in lines if s == (1, 1)]
+	neg_slope_points = [p for p, s in lines if s == (1, -1)]
 
-	return new_points
+	return filter_per_slope(pos_slope_points, (1, 1)), filter_per_slope(neg_slope_points, (1, -1))
 
-def tesselate_grid(min_lim, max_lim, linear_count):
-	tile_width = int((max_lim - min_lim) / linear_count)
+def find_intersection(line_pair):
+	((xa, ya), (sxa, sya)), ((xb, yb), (sxb, syb)) = line_pair
 
-	if tile_width % 2 == 0:
-		tile_width += 1
+	offset_y = ya - yb
 
-	r = int(tile_width / 2)
+	txa = xa + offset_y * syb
+	tya = ya - offset_y
 
-	oc_indices = range(min_lim, max_lim + 1, tile_width - 1)
-	ic_indices = range(min_lim + r, max_lim + 1, tile_width - 1)
+	if not (txa + xb) % 2 == 0:
+		return None
 
-	oc_tiles = [(x, y, r) for x in oc_indices for y in oc_indices]
-	ic_tiles = [(x, y, r) for x in ic_indices for y in ic_indices]
+	mid_offset = int((txa + xb) / 2 - txa)
 
-	return oc_tiles + ic_tiles
+	return (txa + mid_offset, tya + (mid_offset * sya))
 
-def parse_simple_line(line):
-	nums = [int(i) for i in line.split(',')]
-
-	return (nums[0], nums[1]), nums[2]
-
-def parse_simple_input(infn):
-	with open(infn, 'r') as f:
-		result = [parse_simple_line(l) for l in f.readlines()]
-
-	return result
-
-def execute(infn, max_lim):
+def execute(infn):
 	data = parse_input(infn)
-
-	min_lim = 0
 
 	sensors = [(a, mh_dist(a, b)) for a, b in data]
 
-	sensors = list(sorted(sensors, key=lambda x: x[1], reverse=True))
+	pairs = find_nearly_adjacent_pairs(sensors, 2)
 
-	tiles = tesselate_grid(min_lim, max_lim, 32)
+	adjacency_lines = list(set([get_line(pair) for pair in pairs]))
 
-	while len(tiles) > 0:
-		tile = tiles.pop()
-		x, y , r = tile
+	pos_lines, neg_lines = remove_duplicate_lines(adjacency_lines)
 
-		if is_tile_offgrid(min_lim, max_lim, tile):
-			# do nothing
-			continue
-		elif is_tile_enclosed(tile, sensors):
-			# do nothing
-			continue
-		else:
-			tiles.extend(tesselate_tile(tile))
+	intersections = set()
 
-			if r == 0:
-				last_good_tile = tile
+	for line_pair in itertools.product(pos_lines, neg_lines):
+		intersections.add(find_intersection(line_pair))
 
-	x, y, r = last_good_tile
+	intersections = [i for i in intersections if not i == None]
 
-	return x * 4000000 + y
+	intersections = [i for i in intersections if not is_point_enclosed(i, sensors)]
 
-def main(infn, max_lim):
+	return intersections[0][0] * 4000000 + intersections[0][1]
+
+def main(infn):
 	pre = time.perf_counter()
 
-	result = execute(infn, max_lim)
+	result = execute(infn)
 
 	post = time.perf_counter()
 
 	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
 
 if __name__ == '__main__':
-	#main('test1.txt', 20)
-	#main('test2.txt', 20)
-	main('input.txt', 4000000)
+	main('test1.txt')
+	#main('test2.txt')
+	main('input.txt')
