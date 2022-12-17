@@ -1,6 +1,7 @@
 # 20xx/xx/p1.py
 
 from collections import deque
+import math
 import time
 
 
@@ -59,9 +60,10 @@ def find_highest_rock(board):
 	# unreachable with correct initialization
 	return -1
 
-def process_turn(board, rocks, jets, rock_count):
+def process_turn(board, rocks, jets, rock_index, jet_index, seen):
 	rock, width, height = rocks[0]
 	rocks.rotate(-1)
+	rock_index += 1
 
 	space_required = (height + 3) - find_highest_rock(board)
 
@@ -79,6 +81,10 @@ def process_turn(board, rocks, jets, rock_count):
 		# Horizontal Movement
 		jet = jets[0]
 		jets.rotate(-1)
+		jet_index += 1
+
+		if jet_index >= len(jets):
+			jet_index = 0
 
 		prev_x = x
 		x -= jet
@@ -101,6 +107,15 @@ def process_turn(board, rocks, jets, rock_count):
 
 	cement_rock(board, rock, x, y)
 
+	highest_rock = find_highest_rock(board)
+
+	if len(board) > 25 + highest_rock:
+		key = (rock_index, jet_index, sum([board[i + highest_rock] << (i * 7) for i in range(25)]))
+	else:
+		key = 0
+
+	return key, len(board) - highest_rock - 1
+
 def print_board(board, rock, height, rock_x, rock_y):
 	floor = len(board) - 1
 
@@ -119,10 +134,46 @@ def execute(infn, width, target_rock_count):
 	rocks = get_rocks()
 	board = get_initial_board()
 
-	for count in range(target_rock_count):
-		process_turn(board, rocks, jets, count)
+	simulation_length = math.lcm(len(jets), len(rocks)) * 25
 
-	return len(board) - find_highest_rock(board) - 1
+	partial = target_rock_count % simulation_length
+
+	multiple = int(target_rock_count / simulation_length) - 1
+
+	rock_index = -1
+	jet_index = -1
+
+	seen = {}
+	heights = {}
+
+	count = 0
+
+	while True:
+		key, height = process_turn(board, rocks, jets, rock_index, jet_index, seen)
+
+		count += 1
+
+		if key in seen.keys():
+			break
+		elif not key == 0:
+			seen[key] = (height, count)
+			heights[count] = height
+
+	start_height, start_count = seen[key]
+
+	period_height = height - start_height
+
+	target_rock_count_without_start = target_rock_count - start_count
+
+	period_length = count - start_count
+
+	num_periods = int(target_rock_count_without_start / period_length)
+
+	residual_count = target_rock_count_without_start % period_length
+
+	residual_height = heights[residual_count + start_count] - heights[start_count]
+
+	return start_height + period_height * num_periods + residual_height
 
 def main(infn, width, target_rock_count):
 	pre = time.perf_counter()
