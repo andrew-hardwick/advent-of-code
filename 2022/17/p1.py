@@ -109,8 +109,8 @@ def process_turn(board, rocks, jets, rock_index, jet_index, seen):
 
 	highest_rock = find_highest_rock(board)
 
-	if len(board) > 25 + highest_rock:
-		key = (rock_index, jet_index, sum([board[i + highest_rock] << (i * 7) for i in range(25)]))
+	if len(board) > 15 + highest_rock:
+		key = (rock_index, jet_index, sum([board[i + highest_rock] << (i * 7) for i in range(15)]))
 	else:
 		key = 0
 
