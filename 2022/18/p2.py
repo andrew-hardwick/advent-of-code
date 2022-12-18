@@ -51,8 +51,6 @@ def calculate_surface_area(cubes):
 			external[voxel] = 1
 			unprocessed.add(voxel)
 
-	print_body(external, length)
-
 	return surface_area
 
 def print_body(volume, length):
