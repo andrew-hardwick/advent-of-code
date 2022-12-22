@@ -1,4 +1,4 @@
-# 20xx/xx/p1.py
+# 2022/16/p1.py
 
 import functools
 import heapq
@@ -107,14 +107,21 @@ def process_map(cave_map):
 		new_map[room] = {}
 		new_map[room]['flow'] = cave_map[room]['flow']
 		new_map[room]['linked'] = dict(find_paths_to_targets_from_room(room, rooms_with_flow, cave_edges, cave_vertices))
+		new_map[room]['available'] = list(new_map[room]['linked'].keys())
 
 	return new_map, rooms_with_flow, cave_edges, cave_vertices
 
-def find_best_path(past, past_flow, current, minute, time_limit, cave_map):
+def find_best_path(past, past_flow, length_limit, current, minute, time_limit, cave_map):
+	if past == ['BB']:
+		linked = cave_map[current]['linked']
+		available = cave_map[current]['available']
+
+		print('available: ', available)
+
 	if minute > time_limit:
 		return past, past_flow
 
-	if len(past) > len(cave_map.keys()):
+	if len(past) > length_limit:
 		return past, past_flow
 
 	linked = cave_map[current]['linked']
@@ -133,7 +140,10 @@ def find_best_path(past, past_flow, current, minute, time_limit, cave_map):
 		flow += cave_map[current]['flow'] * flow_time
 		next_minute += 1
 
-	next_steps = [find_best_path(next_past, flow, link, next_minute + linked[link], time_limit, cave_map) for link in linked]
+	next_steps = [find_best_path(next_past, flow, length_limit, link, next_minute + linked[link], time_limit, cave_map) for link in cave_map[current]['available'] if link not in past and link in linked]
+
+	if len(next_steps) == 0:
+		return next_past, flow
 
 	return max(next_steps, key=lambda s: s[1])
 
@@ -144,8 +154,7 @@ def execute(infn):
 
 	paths_from_AA = dict(find_paths_to_targets_from_room('AA', rooms_with_flow, cave_edges, cave_vertices))
 
-
-	paths = [find_best_path(['AA'], 0, next_edge, paths_from_AA[next_edge], 30, cave_map) for next_edge in paths_from_AA.keys()]
+	paths = [find_best_path(['AA'], 0, len(rooms_with_flow), next_edge, paths_from_AA[next_edge], 30, cave_map) for next_edge in paths_from_AA.keys()]
 
 	return max([flow for path, flow in paths])
 
