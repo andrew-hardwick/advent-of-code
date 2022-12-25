@@ -37,20 +37,33 @@ def choose_next(blueprint, time, time_limit, materials, producers, max_producers
 	max_geodes = 0
 	best_child_history = []
 
-	if history == [1]:
+	if history == [1, 1, 1]:
+		print()
 		print(history, choice, time)
-		print(materials, blueprint[choice])
+		print(materials, blueprint[choice], producers)
 		print(able_to_purchase(blueprint, materials, choice))
 		print()
 
 	if time > time_limit:
 		return materials[3], history
 
+	# if history == [1, 1, 1] and choice == 2:
+	# 	print('waiting for obsidian availability', time)
+	# 	print('materials', materials)
+	# 	print('producers', producers)
+	# 	print()
+
 	# TODO make this do the necessary time steps without looping (and do an additional instead of below)
 	while not able_to_purchase(blueprint, materials, choice):
 		if time > time_limit:
 			return materials[3], history
 		materials, time = time_step(materials, producers, time, 1)
+
+	# if history == [1, 1, 1] and choice == 2:
+	# 	print('time after waiting', time)
+	# 	print('materials', materials)
+	# 	print('producers', producers)
+	# 	print()
 
 	if time > time_limit:
 		return materials[3], history
@@ -66,8 +79,10 @@ def choose_next(blueprint, time, time_limit, materials, producers, max_producers
 
 	# decide on buying additional producers here
 	for next_choice in range(3, -1, -1):
+		if this_history == [1, 1, 1] and next_choice == 2:
+			print('first obsidian:', time)
 		if producers[next_choice] < max_producers[next_choice] and not unable_to_produce(blueprint, producers, next_choice):
-			geodes, child_history = choose_next(blueprint, time + 1, time_limit, materials.copy(), producers.copy(), max_producers, next_choice, this_history.copy())
+			geodes, child_history = choose_next(blueprint, time, time_limit, materials.copy(), producers.copy(), max_producers, next_choice, this_history.copy())
 
 			if geodes > max_geodes:
 				max_geodes = geodes
@@ -83,7 +98,9 @@ def optimize(blueprint, time_limit):
 	max_producers[3] = time_limit
 
 	# we can only buy choices 0 or 1 so we should only call for those
-	results = [choose_next(blueprint, 0, time_limit + 1, materials, producers, max_producers, choice, []) for choice in range(2)]
+	results = [choose_next(blueprint, 0, time_limit + 1, materials, producers.copy(), max_producers, choice, []) for choice in range(2)]
+
+	print('exploration complete')
 
 	print(results, max_producers)
 
@@ -95,6 +112,12 @@ def optimize(blueprint, time_limit):
 
 def execute(infn, time_limit):
 	blueprints = parse_input(infn)
+
+	result_1 = optimize(blueprints[0], time_limit)
+	print(result_1)
+	return
+
+	return '??'
 
 	optimal_results = [optimize(blueprint, time_limit) for blueprint in blueprints]
 
