@@ -1,21 +1,16 @@
-# 20xx/xx/p2.py
+# 2022/04/p2.py
 
 import time
 
+from p1 import parse_input
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
-
-	return data
 
 def execute(infn):
-	data = parse_input(infn)
+	sections = parse_input(infn)
 
-	# do the thing
-	result = 0
+	overlap = ((a[0] <= b[0] and a[1] >= b[0]) or (b[0] <= a[0] and b[1] >= a[0]) for a, b in sections)
 
-	return result
+	return sum(overlap)
 
 def main(infn):
 	pre = time.perf_counter()
