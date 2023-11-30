@@ -2,28 +2,41 @@
 
 import time
 
+from p1 import parse_input
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		entries = [str.strip(l) for l in f.readlines()]
-	return entries
 
-def execute(infn):
-	data = parse_input(infn)
+def process_single_char(
+        char):
+    if char == '"' or char == '\\':
+        return 1
 
-	# do the thing
+    return 0
 
-	return '??'
+
+def process_single_line(
+        line):
+    return sum(process_single_char(c) for c in line) + 2
+
+
+def execute(
+        infn):
+    data = parse_input(infn)
+
+    total = sum(process_single_line(line) for line in data)
+
+    return str(total)
+
 
 def main(infn):
-	pre = time.perf_counter()
+    pre = time.perf_counter()
 
-	result = execute(infn)
+    result = execute(infn)
 
-	post = time.perf_counter()
+    post = time.perf_counter()
 
-	print(result, 'in', (post - pre) * 1000, 'ms')
+    print(result, 'in', (post - pre) * 1000, 'ms')
+
 
 if __name__ == '__main__':
-	main('test1.txt')
-	main('input.txt')
+    main('input.txt')
+
