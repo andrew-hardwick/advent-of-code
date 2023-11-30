@@ -7,10 +7,10 @@ import numpy
 
 def parse_input(infn):
 	direction_map = {
-		'<': numpy.array([-1, 0]),
-		'^': numpy.array([0, 1]),
-		'>': numpy.array([1, 0]),
-		'v': numpy.array([0, -1])
+		'<': numpy.array([-1,  0]),
+		'^': numpy.array([ 0,  1]),
+		'>': numpy.array([ 1,  0]),
+		'v': numpy.array([ 0, -1])
 	}
 
 	with open(infn, 'r') as f:

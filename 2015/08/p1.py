@@ -25,8 +25,6 @@ def count_actual_chars(line):
 
 	len_after_special_chars -= special_chars_removed
 
-	print(line, len(line), len_after_special_chars)
-
 	return len(line), len_after_special_chars
 
 def execute(infn):
@@ -46,5 +44,5 @@ def main(infn):
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
 if __name__ == '__main__':
-	main('test1.txt')
 	main('input.txt')
+
