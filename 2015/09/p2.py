@@ -2,30 +2,29 @@
 
 import time
 
+from p1 import parse_input, calculate_distances
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
-
-	return data
 
 def execute(infn):
-	data = parse_input(infn)
+    legs_distances = parse_input(infn)
 
-	# do the thing
-	result = 0
+    distances = calculate_distances(legs_distances)
 
-	return result
+    result = max(distances)
+
+    return result
+
 
 def main(infn):
-	pre = time.perf_counter()
+    pre = time.perf_counter()
 
-	result = execute(infn)
+    result = execute(infn)
 
-	post = time.perf_counter()
+    post = time.perf_counter()
 
-	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
+    print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
+
 
 if __name__ == '__main__':
-	main('test1.txt')
-	main('input.txt')
+    main('input.txt')
+
