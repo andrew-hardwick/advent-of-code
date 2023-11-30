@@ -2,30 +2,47 @@
 
 import time
 
+from p1 import parse_target_sue_info, parse_input
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
 
-	return data
+def identify_matching_sue(
+		target,
+		candidates):
+	for sue, attributes in candidates.items():
+		found = True
+		for ak, av in attributes.items():
+			if ak == 'cats' or ak == 'trees':
+				found &= av > target[ak]
+			if ak == 'pomeranians' or ak == 'goldfish':
+				found &= av < target[ak]
+			else:
+				found &= av == target[ak]
 
-def execute(infn):
-	data = parse_input(infn)
+		if found:
+			return sue
 
-	# do the thing
-	result = 0
 
-	return result
+def execute(
+		suefn,
+		infn):
+	target_sue_info = parse_target_sue_info(suefn)
 
-def main(infn):
+	candidates = parse_input(infn)
+
+	return identify_matching_sue(target_sue_info, candidates)
+
+
+def main(
+		suefn,
+		infn):
 	pre = time.perf_counter()
 
-	result = execute(infn)
+	result = execute(suefn, infn)
 
 	post = time.perf_counter()
 
 	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
 
+
 if __name__ == '__main__':
-	main('test1.txt')
-	main('input.txt')
+	main('sue_info.txt', 'input.txt')

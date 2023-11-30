@@ -2,30 +2,33 @@
 
 import time
 
+from p1 import parse_input, count_valid_combinations
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
 
-	return data
+def execute(
+		infn,
+		eggnog):
+	source = parse_input(infn)
 
-def execute(infn):
-	data = parse_input(infn)
+	valid_cases, _ = count_valid_combinations(source, eggnog, 0, 0, [])
 
-	# do the thing
-	result = 0
+	minimum = min(valid_cases)
 
-	return result
+	return len([c for c in valid_cases if c == minimum])
 
-def main(infn):
+
+def main(
+		infn,
+		eggnog):
 	pre = time.perf_counter()
 
-	result = execute(infn)
+	result = execute(infn, eggnog)
 
 	post = time.perf_counter()
 
 	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
 
+
 if __name__ == '__main__':
-	main('test1.txt')
-	main('input.txt')
+	main('test1.txt', 25)
+	main('input.txt', 150)
