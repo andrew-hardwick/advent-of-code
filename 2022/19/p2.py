@@ -3,29 +3,35 @@
 import time
 
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
+def parse_input(
+        infn):
+    with open(infn, 'r') as f:
+        data = (str.strip(line) for line in f.readlines())
 
-	return data
+    return data
 
-def execute(infn):
-	data = parse_input(infn)
 
-	# do the thing
-	result = 0
+def execute(
+        infn):
+    data = parse_input(infn)
 
-	return result
+    # do the thing
+    result = 0
 
-def main(infn):
-	pre = time.perf_counter()
+    return result
 
-	result = execute(infn)
 
-	post = time.perf_counter()
+def main(
+        infn):
+    pre = time.perf_counter()
 
-	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
+    result = execute(infn)
+
+    post = time.perf_counter()
+
+    print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
+
 
 if __name__ == '__main__':
-	main('test1.txt')
-	main('input.txt')
+    main('input.txt')
+

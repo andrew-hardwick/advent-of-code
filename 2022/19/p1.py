@@ -1,129 +1,139 @@
 # 20xx/xx/p1.py
 
-import math
-import re
 import time
 
 import numpy as np
 
-def parse_line(line):
-	numbers = [int(i) for i in re.findall(r'\d+', line)]
 
-	ore_bot = (np.array([numbers[1], 0, 0, 0]), np.array([1, 0, 0, 0]))
-	clay_bot = (np.array([numbers[2], 0, 0, 0]), np.array([0, 1, 0, 0]))
-	obsidian_bot = (np.array([numbers[3], numbers[4], 0, 0]), np.array([0, 0, 1, 0]))
-	geode_bot = (np.array([numbers[5], 0, numbers[6], 0]), np.array([0, 0, 0, 1]))
+def parse_blueprint(
+		line):
+	line = line.split(': ')[1]
 
-	return ore_bot, clay_bot, obsidian_bot, geode_bot
+	line = line.replace(' ore', ' ')
+	line = line.replace(' clay', ' ')
+	line = line.replace(' geode', ' ')
+	line = line.replace(' obsidian', ' ')
 
-def parse_input(infn):
+	line = line.replace('Each  robot costs', '')
+	line = line.replace(' and', '')
+	line = line.replace('.', '')
+	line = line.replace('  ', ' ')
+	line = line.replace('  ', ' ')
+
+	line = line.strip()
+	
+	costsource = line.split(' ')
+
+	costs = [int(c) for c in costsource]
+
+	ore_cost = np.zeros(4)
+	ore_cost[0] = costs[0]
+
+	clay_cost = np.zeros(4)
+	clay_cost[0] = costs[1]
+
+	obsidian_cost = np.zeros(4)
+	obsidian_cost[0] = costs[2]
+	obsidian_cost[1] = costs[3]
+
+	geode_cost = np.zeros(4)
+	geode_cost[0] = costs[4]
+	geode_cost[2] = costs[5]
+
+	blueprint = np.stack([ore_cost, clay_cost, obsidian_cost, geode_cost]).astype(int)
+
+	return blueprint
+	
+
+def parse_input(
+		infn):
 	with open(infn, 'r') as f:
-		blueprints = [parse_line(l) for l in f.readlines()]
+		blueprints = [parse_blueprint(line) for line in f.readlines()]
 
 	return blueprints
 
-def time_step(materials, producers, time, time_delta):
-	return materials + (producers * time_delta), time + time_delta
+def maximize_geodes(
+		blueprint,
+		time_limit):
+	max_robots = blueprint.max(axis=0).astype(int)
+	max_robots[3] = 10000
 
-	return [materials[i] + (producers[i] * time_delta) for i in range(4)], time + time_delta
+	print(blueprint)
+	print(max_robots)
+	print()
 
-def calculate_wait_time(blueprint, materials, producers, choice):
-	possible_times = [math.ceil(i) for i in ((blueprint[choice][0] - materials) / producers) if i >= 1]
+	state = {
+		'time_left': time_limit,
+		'robots': np.array([1, 0, 0, 0]).astype(int),
+		'resources': np.zeros(4).astype(int)
+	}
 
-	if len(possible_times) > 0:
-		return min(possible_times) + 1, possible_times
+	max_geodes = 0
 
-	return 0, possible_times
+	possibilties = [state]
 
-def choose_next(blueprint, time, time_limit, materials, producers, max_producers, choice, history):
-	wait_time, possible_times = calculate_wait_time(blueprint, materials, producers, choice)
+	while len(possibilties) > 0:
+		state = possibilties.pop(0)
 
-	test_history = [1, 1]
+		if state['resources'][3] > max_geodes:
+			print(state)
 
-	if history == test_history:
-		print('choice', choice)
-		print(history)
-		print('cost', blueprint[choice][0])
-		print('materials', materials)
-		print('producers', producers)
-		print()
+		max_geodes = max(max_geodes, state['resources'][3])
 
-	if time + wait_time > time_limit:
-		return materials[3] + producers[3] * (time_limit - time)
+		# print(len(possibilties))
 
-	materials, time = time_step(materials, producers, time, wait_time)
+		# print(state)
 
-	if history == test_history:
-		print('cost', blueprint[choice][0])
-		print('time', time)
-		print('possible_times', possible_times)
-		print('wait_time', wait_time)
-		print('materials', materials)
-		print('producers', producers)
-		print()
+		# some number of disqualifications
+		if state['time_left'] == 0:
+			continue
 
-	materials = materials - blueprint[choice][0]
+		# add states for actions
+		for i in range(4):
+			if state['robots'][i] < max_robots[i] and all(state['resources'] >= blueprint[i]):
+				# print('buying a', i)
+				next_state = state.copy()
+				next_state['time_left'] -= 1
+				next_state['resources'] = state['resources'] - blueprint[i] + state['robots']
+				next_state['robots'][i] += 1
 
-	materials, time = time_step(materials, producers, time, 1)
+				possibilties.append(next_state)
 
-	producers = producers + blueprint[choice][1]
+		# add null state
+		next_state = state.copy()
+		next_state['time_left'] -= 1
+		next_state['resources'] = state['resources'] + state['robots']
 
-	if time >= time_limit:
-		return materials[3] + producers[3] * (time_limit - time)
+		possibilties.append(next_state)
 
-	if history == test_history:
-		print('time', time)
-		print('materials', materials)
-		print('producers', producers)
-		print()
+	print(max_geodes)
 
-	non_max_robots = set([i for i in range(4) if producers[i] < max_producers[i]])
-	able_to_buy_robots = set([i for i in range(4) if all(not producers[j] == 0 or blueprint[i][0][j] == 0 for j in range(4))])
+	return max_geodes
 
-	robots_to_buy = non_max_robots & able_to_buy_robots
-
-	next_history = history + [choice]
-
-	child_geodes = [choose_next(blueprint, time, time_limit, materials.copy(), producers.copy(), max_producers, next_robot, next_history) for next_robot in robots_to_buy]
-
-	return max(child_geodes)
-
-def optimize(blueprint, time_limit):
-	materials = np.array([0, 0, 0, 0])
-	producers = np.array([1, 0, 0, 0])
-
-	max_producers = np.array([max((blueprint[r][0][i] for r in range(4))) for i in range(4)])
-	max_producers[3] = time_limit
-
-	for i in range(2):
-		next_bot = 1 - i
-
-		geodes = choose_next(blueprint, 0, time_limit, materials, producers, max_producers, next_bot, [])
-
-	return geodes
-
-def execute(infn, time_limit):
+def execute(
+		infn):
 	blueprints = parse_input(infn)
 
-	test = optimize(blueprints[0], time_limit)
+	geodes = [maximize_geodes(blueprint, 10) for blueprint in blueprints]
 
-	return '??'
+	quality = [i * g for i, g in enumerate(geodes)]
 
-	geodes = [optimize(blueprint, time_limit) for blueprint in blueprints]
+	result = sum(quality)
 
-	quality_levels = [i * g for i, g in enumerate(geodes)]
+	return result
 
-	return sum(quality_levels)
 
-def main(infn, time_limit):
+def main(
+		infn):
 	pre = time.perf_counter()
 
-	result = execute(infn, time_limit)
+	result = execute(infn)
 
 	post = time.perf_counter()
 
 	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
 
+
 if __name__ == '__main__':
-	main('test1.txt', 24)
-#	main('input.txt')
+	main('test1.txt')
+
