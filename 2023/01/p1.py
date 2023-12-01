@@ -3,35 +3,48 @@
 import time
 
 
+digit_map = {
+    'one': 'o1e',
+    'two': 't2o',
+    'three': 't3e',
+    'four': 'f4r',
+    'five': 'f5e',
+    'six': 's6x',
+    'seven': 's7n',
+    'eight': 'e8t',
+    'nine': 'n9e'
+}
+
+
+def parse_line(
+        line,
+        replace_text_with_digits):
+    line = line.strip()
+
+    if replace_text_with_digits:
+        for k, v in digit_map.items():
+            line = line.replace(k, v)
+
+    return line
+
+
 def parse_input(
-        infn):
+        infn,
+        replace_text_with_digits):
     with open(infn, 'r') as f:
-        data = (str.strip(line) for line in f.readlines())
+        data = (parse_line(line, replace_text_with_digits) for line in f.readlines())
 
     return data
 
 
-def find_digits(
-        line):
-    first = -1
-    last = 0
-
-    for c in line:
-        if c.isdigit():
-            if first == -1:
-                first = c
-            last = c
-
-    return first, last
-
-
 def execute(
-        infn):
-    data = parse_input(infn)
+        infn,
+        replace_text_with_digits):
+    data = parse_input(infn, replace_text_with_digits)
 
-    found_digits = (find_digits(line) for line in data)
+    found_digits = ([int(c) for c in line if c.isdigit()] for line in data)
 
-    combined = (int(f'{a}{b}') for a, b in found_digits)
+    combined = (digits[0] * 10 + digits[-1] for digits in found_digits)
 
     result = sum(combined)
 
@@ -39,10 +52,11 @@ def execute(
 
 
 def main(
-        infn):
+        infn,
+        replace_text_with_digits):
     pre = time.perf_counter()
 
-    result = execute(infn)
+    result = execute(infn, replace_text_with_digits)
 
     post = time.perf_counter()
 
@@ -50,6 +64,6 @@ def main(
 
 
 if __name__ == '__main__':
-    main('test1.txt')
-    main('input.txt')
+    main('test1.txt', False)
+    main('input.txt', False)
 
