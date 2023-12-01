@@ -15,6 +15,18 @@ digit_map = {
     'nine': 9
 }
 
+rev_digit_map = {
+    'eno': 1,
+    'owt': 2,
+    'eerht': 3,
+    'ruof': 4,
+    'evif': 5,
+    'xis': 6,
+    'neves': 7,
+    'thgie': 8,
+    'enin': 9
+}
+
 
 def parse_input(
         infn):
@@ -41,9 +53,9 @@ def find_last(
     for i, v in enumerate(rev_line):
         if v.isdigit():
             return int(v)
-        for k in digit_map.keys():
-            if rev_line[i:i + len(k)] == ''.join(reversed(k)):
-                return digit_map[k]
+        for k in rev_digit_map.keys():
+            if rev_line[i:i + len(k)] == k:
+                return rev_digit_map[k]
 
 
 def find_digits(
