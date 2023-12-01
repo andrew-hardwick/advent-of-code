@@ -15,11 +15,13 @@ def parse_line(line):
 
 	return split[0], [int(s) for s in split[1:]]
 
+
 def parse_input(infn):
 	with open(infn, 'r') as f:
-		instructions = [parse_line(l) for l in f.readlines()]
+		instructions = [parse_line(line) for line in f.readlines()]
 
 	return instructions
+
 
 def decorate(instructions, ops):
 	edge_length = 1000
@@ -35,6 +37,7 @@ def decorate(instructions, ops):
 
 	return light_grid
 
+
 def execute(infn):
 	instructions = parse_input(infn)
 
@@ -48,6 +51,7 @@ def execute(infn):
 
 	return int(sum(sum(light_grid)))
 
+
 def main(infn):
 	pre = time.perf_counter()
 
@@ -57,5 +61,7 @@ def main(infn):
 
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
+
 if __name__ == '__main__':
 	main('input.txt')
+

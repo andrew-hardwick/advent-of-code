@@ -15,6 +15,7 @@ def execute(infn):
 
 	return len(all_visited)
 
+
 def main(infn):
 	pre = time.perf_counter()
 
@@ -24,6 +25,8 @@ def main(infn):
 
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
+
 if __name__ == '__main__':
 	main('test1.txt')
 	main('input.txt')
+

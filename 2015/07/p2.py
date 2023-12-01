@@ -17,6 +17,7 @@ def execute(infn, target):
 
 	return node_map[target].get_value(node_map)
 
+
 def main(infn, target):
 	pre = time.perf_counter()
 
@@ -26,6 +27,8 @@ def main(infn, target):
 
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
+
 if __name__ == '__main__':
 	main('test1.txt', 'd')
 	main('input.txt', 'a')
+

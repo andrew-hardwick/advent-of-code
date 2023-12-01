@@ -9,12 +9,14 @@ def parse_input(infn):
 
 	return data
 
+
 def execute(infn):
 	data = parse_input(infn)
 
 	result = sum(data)
 
 	return result
+
 
 def main(infn):
 	pre = time.perf_counter()
@@ -25,5 +27,7 @@ def main(infn):
 
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
+
 if __name__ == '__main__':
 	main('input.txt')
+

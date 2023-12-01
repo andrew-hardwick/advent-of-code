@@ -18,6 +18,7 @@ def execute(infn):
 
 	return int(sum(sum(light_grid)))
 
+
 def main(infn):
 	pre = time.perf_counter()
 
@@ -27,5 +28,7 @@ def main(infn):
 
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
+
 if __name__ == '__main__':
 	main('input.txt')
+

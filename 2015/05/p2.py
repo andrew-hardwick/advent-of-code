@@ -14,6 +14,7 @@ def letter_pair_check(word):
 
 	return False
 
+
 def repeat_with_interstitial_check(word):
 	for i, c in enumerate(word[:-2]):
 		if c == word[i + 2]:
@@ -21,8 +22,10 @@ def repeat_with_interstitial_check(word):
 
 	return False
 
+
 def determine_if_nice(word):
 	return letter_pair_check(word) and repeat_with_interstitial_check(word)
+
 
 def execute(infn):
 	data = parse_input(infn)
@@ -33,6 +36,7 @@ def execute(infn):
 
 	return '??'
 
+
 def main(infn):
 	pre = time.perf_counter()
 
@@ -42,6 +46,8 @@ def main(infn):
 
 	print(result, 'in', (post - pre) * 1000, 'ms')
 
+
 if __name__ == '__main__':
 	main('test2.txt')
 	main('input.txt')
+

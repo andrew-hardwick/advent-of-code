@@ -1,7 +1,5 @@
 # 2021/xx/p1.py
 
-import time
-
 from p1 import main
 
 
