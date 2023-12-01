@@ -4,80 +4,52 @@ import time
 
 
 digit_map = {
-    'one': '1',
-    'two': '2',
-    'three': '3',
-    'four': '4',
-    'five': '5',
-    'six': '6',
-    'seven': '7',
-    'eight': '8',
-    'nine': '9'
+    'one': 1,
+    'two': 2,
+    'three': 3,
+    'four': 4,
+    'five': 5,
+    'six': 6,
+    'seven': 7,
+    'eight': 8,
+    'nine': 9
 }
-
-
-def parse_line(
-        line):
-    line = line.strip()
-
-    index_map = {}
-
-    for k in digit_map.keys():
-        index_map[k] = len(line) + 1
-        location = line.find(k)
-
-        if location != -1:
-            index_map[k] = location
-
-    first_key, index = min(list(index_map.items()), key=lambda x: x[1])
-
-    line_from_left = line
-    if index < len(line):
-        line_from_left = line[:index] + digit_map[first_key] + line[len(first_key) + index:]
-
-    index_map = {}
-
-    for k in digit_map.keys():
-        index_map[k] = -1
-        location = line.rfind(k)
-
-        if location != -1:
-            index_map[k] = location
-
-    first_key, index = max(list(index_map.items()), key=lambda x: x[1])
-
-    line_from_right = line
-    if index > 0:
-        line_from_right = line[:index] + digit_map[first_key] + line[len(first_key) + index:]
-
-    return line_from_left, line_from_right
 
 
 def parse_input(
         infn):
     with open(infn, 'r') as f:
-        data = (parse_line(line) for line in f.readlines())
+        data = (line.strip() for line in f.readlines())
 
     return data
 
 
+def find_first(
+        line):
+    for i, v in enumerate(line):
+        if v.isdigit():
+            return int(v)
+        for k in digit_map.keys():
+            if line[i:i + len(k)] == k:
+                return digit_map[k]
+
+
+def find_last(
+        line):
+    rev_line = ''.join(reversed(line))
+
+    for i, v in enumerate(rev_line):
+        if v.isdigit():
+            return int(v)
+        for k in digit_map.keys():
+            if rev_line[i:i + len(k)] == ''.join(reversed(k)):
+                return digit_map[k]
+
+
 def find_digits(
         line):
-    line_from_left, line_from_right = line
-
-    first = -1
-    last = -1
-
-    for c in line_from_left:
-        if c.isdigit():
-            if first == -1:
-                first = c
-                break
-
-    for c in reversed(line_from_right):
-        if c.isdigit() and last == -1:
-            last = c
-            break
+    first = find_first(line)
+    last = find_last(line)
 
     return first, last
 
