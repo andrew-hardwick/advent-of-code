@@ -3,29 +3,65 @@
 import time
 
 
-def parse_input(infn):
-	with open(infn, 'r') as f:
-		data = (str.strip(l) for l in f.readlines())
+def parse_input(
+        infn):
+    with open(infn, 'r') as f:
+        source = (str.strip(line) for line in f.readlines())
 
-	return data
+    replacements = []
 
-def execute(infn):
-	data = parse_input(infn)
+    mode = 'subs'
+    for line in source:
+        if mode == 'subs':
+            if len(line) == 0:
+                mode = 'molecule'
+                continue
+            replacements.append(line.split(' => '))
+        else:
+            molecule = line
+    return molecule, replacements
 
-	# do the thing
-	result = 0
 
-	return result
+def get_unique_molecules(
+        molecule,
+        replacements):
+    unique_molecules = set()
 
-def main(infn):
-	pre = time.perf_counter()
+    for key, repl in replacements:
+        split_by_key = molecule.split(key)
 
-	result = execute(infn)
+        for i in range(1, len(split_by_key)):
+            left_hand = key.join(split_by_key[:i])
+            right_hand = key.join(split_by_key[i:])
 
-	post = time.perf_counter()
+            candidate = left_hand + repl + right_hand
 
-	print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
+            unique_molecules.add(candidate)
+
+    return unique_molecules
+
+
+def execute(
+        infn):
+    molecule, replacements = parse_input(infn)
+
+    # do the thing
+    unique_molecules = get_unique_molecules(molecule, replacements)
+
+    return len(unique_molecules)
+
+
+def main(
+        infn):
+    pre = time.perf_counter()
+
+    result = execute(infn)
+
+    post = time.perf_counter()
+
+    print(result, 'in', '{:.2f}'.format((post - pre) * 1000), 'ms')
+
 
 if __name__ == '__main__':
-	main('test1.txt')
-	main('input.txt')
+    main('input.txt')
+
